@@ -1,0 +1,24 @@
+The Challenge
+You will be required to build a data pipeline to extract, transform, and load (ETL) data from a source to a target. The data source is a CSV file containing information about car sales. The target is a database table.you should extract the data from the CSV file, perform some basic data transformations, and load the data into the database table. The following transformations should be performed:
+
+•    You must provide the data.
+•    Remove any rows with missing values.
+•    Convert the date columns to a standard format.
+•    Create a new column to store the year of the sale.
+•    Replace the categorical values in the "Car Model" column with numerical values.
+
+Requirements:
+1.    The pipeline should be built using Python.
+2.    The target database should be either PostgreSQL or MySQL.
+3.    The pipeline should be runnable using a command-line interface.
+4.    The pipeline should have error handling and logging capabilities.
+5.    The pipeline should be modular and easily extendable to handle additional data sources and transformations.
+
+
+Evaluation Criteria:
+•    Code quality: Does the code follow good programming practices and conventions, such as proper formatting, naming, and separation of concerns?
+•    Functionality: Does the pipeline meet the requirements described above and work as expected?
+•    Scalability: Is the pipeline designed in a way that it can handle large amounts of data without performance issues?
+•    Maintainability: Is the pipeline organized in a way that makes it easy to modify and extend in the future?
+
+Data source: https://data.world/vizwiz/mock-car-sales

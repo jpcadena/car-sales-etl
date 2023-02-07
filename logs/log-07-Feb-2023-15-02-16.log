@@ -1,0 +1,2 @@
+[2023-02-07 15:02:16][DEBUG][proactor_events][__init__][630]: Using proactor: IocpProactor
+[2023-02-07 15:02:19][INFO][main][main][22]: ETL pipeline completed successfully

@@ -3,23 +3,41 @@ Config script for Core module
 """
 from functools import lru_cache
 from typing import Optional, Any
-from dotenv import load_dotenv
-from numpy import uint16, float16, uint8
-from pydantic import BaseSettings, PostgresDsn, validator
+
+from numpy import float16
+# pylint: disable=no-name-in-module
+from pydantic import BaseSettings, PostgresDsn, validator, EmailStr, \
+    root_validator
+
+
+@root_validator(pre=True)
+def validate_mail_credentials(values):
+    """
+    Validate email credentials before reading the env file
+    :param values:
+    :type values:
+    :return:
+    :rtype:
+    """
+    mail_credentials = values.get('MAIL_CREDENTIALS')
+    if mail_credentials:
+        username, password = mail_credentials.split(':')
+        values['MAIL_CREDENTIALS'] = (username, password)
+    return values
 
 
 class Settings(BaseSettings):
-    dotenv_path: str = '.env'
-    load_dotenv(dotenv_path=dotenv_path)
-
+    """
+    Settings class that inherited from Pydantic BaseSettings
+    """
     MAX_COLUMNS: int
     WIDTH: int
-    CHUNK_SIZE: uint16
+    CHUNK_SIZE: int
     ENCODING: str
 
     PALETTE: str
-    FONT_SIZE: uint8
-    FIG_SIZE: tuple[uint8, uint8] = (15, 8)
+    FONT_SIZE: int
+    FIG_SIZE: tuple[int, int] = (15, 8)
     COLORS: list[str] = ['lightskyblue', 'coral', 'palegreen']
 
     converters: dict = {
@@ -61,6 +79,21 @@ class Settings(BaseSettings):
             host=values.get("POSTGRES_SERVER"),
             path=f"/{values.get('POSTGRES_DB') or ''}",
         )
+
+    MAIL_SERVER: str
+    MAIL_FROM: EmailStr
+    MAIL_TO: EmailStr
+    MAIL_SUBJECT: str
+    MAIL_CREDENTIALS: list[str]
+    MAIL_TIMEOUT: float
+
+    class Config:
+        """
+        Config class for Settings
+        """
+        env_file: str = ".env"
+        env_file_encoding: str = 'utf-8'
+        arbitrary_types_allowed = True
 
 
 settings = Settings()

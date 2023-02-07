@@ -4,12 +4,14 @@ Persistence script for Core module
 import json
 from enum import Enum
 from typing import Union
+
 import pandas as pd
 from pandas.io.parsers import TextFileReader
-from core.config import ENCODING, CHUNK_SIZE
+
+from core.config import settings
 
 
-class DataType(Enum):
+class DataType(str, Enum):
     """
     Data Type class based on Enum
     """
@@ -24,14 +26,14 @@ class PersistenceManager:
 
     @staticmethod
     def save_to_csv(
-            data: Union[list[dict], pd.DataFrame], data_type: str,
-            filename: str = 'data') -> bool:
+            data: Union[list[dict], pd.DataFrame], data_type: DataType,
+            filename: str = 'processed_data.csv') -> bool:
         """
         Save list of dictionaries as csv file
         :param data: list of tweets as dictionaries
         :type data: list[dict]
-        :param data_type: folder where data will be saved from DataType
-        :type data_type: str
+        :param data_type: folder where data will be saved from Data Type
+        :type data_type: DataType
         :param filename: name of the file
         :type filename: str
         :return: confirmation for csv file created
@@ -44,13 +46,14 @@ class PersistenceManager:
             if not data:
                 return False
             dataframe = pd.DataFrame(data)
-        dataframe.to_csv(f'{str(data_type)}{filename}.csv', index=False,
-                         encoding=ENCODING)
+        dataframe.to_csv(f'{data_type.value}{filename}', index=False,
+                         encoding=settings.ENCODING)
         return True
 
     @staticmethod
     def load_from_csv(
-            filename: str = 'processed_data.csv', chunk_size: int = CHUNK_SIZE,
+            filename: str = 'Car Sales.csv',
+            chunk_size: int = settings.CHUNK_SIZE,
             dtypes: dict = None,
             parse_dates: list[str] = None,
             converters: dict = None
@@ -67,9 +70,8 @@ class PersistenceManager:
         # TODO: define column names and its data type to add it to
         #  read_csv method and also the date columns to parse
         text_file_reader: TextFileReader = pd.read_csv(
-            filename, header=0, chunksize=chunk_size, encoding=ENCODING,
-            dtype=dtypes,
-            parse_dates=parse_dates,
+            filename, header=0, chunksize=chunk_size,
+            encoding=settings.ENCODING, dtype=dtypes, parse_dates=parse_dates,
             converters=converters
         )
         dataframe: pd.DataFrame = pd.concat(
@@ -78,34 +80,48 @@ class PersistenceManager:
 
     @staticmethod
     def save_to_pickle(
-            dataframe: pd.DataFrame, filename: str = 'optimized_df.pkl'
-    ) -> None:
+            dataframe: pd.DataFrame, data_type: DataType,
+            filename: str = 'optimized_df.pkl') -> None:
         """
         Save dataframe to pickle file
         :param dataframe: dataframe
         :type dataframe: pd.DataFrame
+        :param data_type: folder where data will be saved from Data Type
+        :type data_type: DataType
         :param filename: name of the file
         :type filename: str
         :return: None
         :rtype: NoneType
         """
-        dataframe.to_pickle(f'data/processed/{filename}')
+        dataframe.to_pickle(f'data/{data_type.value}/{filename}')
 
     @staticmethod
-    def load_from_pickle(filename: str = 'optimized_df.pkl') -> pd.DataFrame:
+    def load_from_pickle(
+            data_type: DataType, filename: str = 'optimized_df.pkl'
+    ) -> pd.DataFrame:
         """
         Load dataframe from Pickle file
         :param filename: name of the file to search and load
         :type filename: str
+        :param data_type: folder where data will be saved from Data Type
+        :type data_type: DataType
         :return: dataframe read from pickle
         :rtype: pd.DataFrame
         """
-        dataframe: pd.DataFrame = pd.read_pickle(f'data/processed/{filename}')
+        dataframe: pd.DataFrame = pd.read_pickle(
+            f'data/{data_type.value}/{filename}')
         return dataframe
 
     @staticmethod
     def read_from_json(
-            filename: str = 'references/related_words_users.json') -> dict:
-        with open(filename, encoding=ENCODING) as file:
+            filename: str = 'docs/config.json') -> dict:
+        """
+        Read data from JSON file
+        :param filename: name of the file to search and load
+        :type filename: str
+        :return: Data loaded as a dictionary
+        :rtype: dict
+        """
+        with open(filename, encoding=settings.ENCODING) as file:
             data: dict[str, list[str]] = json.load(file)
         return data

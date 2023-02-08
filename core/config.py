@@ -4,7 +4,6 @@ Config script for Core module
 from functools import lru_cache
 from typing import Optional, Any
 
-from numpy import float16
 # pylint: disable=no-name-in-module
 from pydantic import BaseSettings, PostgresDsn, validator, EmailStr, \
     root_validator
@@ -34,14 +33,14 @@ class Settings(BaseSettings):
     WIDTH: int
     CHUNK_SIZE: int
     ENCODING: str
+    NUM_BINS: int
 
     PALETTE: str
     FONT_SIZE: int
     FIG_SIZE: tuple[int, int] = (15, 8)
-    COLORS: list[str] = ['lightskyblue', 'coral', 'palegreen']
+    COLORS: list[str]
+    LABELS: list[str]
 
-    converters: dict = {
-        'TotalCharges': lambda x: float16(x.replace(' ', '0.0'))}
     NUMERICS: list[str] = [
         'uint8', 'uint16', 'uint32', 'uint64',
         'int8', 'int16', 'int32',
@@ -52,6 +51,7 @@ class Settings(BaseSettings):
         (-128, 127), (-32768, 32767), (-2147483648, 2147483647),
         (-18446744073709551616, 18446744073709551615)]
 
+    TS_PRECISION: int
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str

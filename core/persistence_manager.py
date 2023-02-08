@@ -3,7 +3,6 @@ Persistence script for Core module
 """
 import json
 from enum import Enum
-from typing import Union
 
 import pandas as pd
 from pandas.io.parsers import TextFileReader
@@ -26,12 +25,12 @@ class PersistenceManager:
 
     @staticmethod
     def save_to_csv(
-            data: Union[list[dict], pd.DataFrame], data_type: DataType,
+            data: pd.DataFrame, data_type: DataType = DataType.PROCESSED,
             filename: str = 'processed_data.csv') -> bool:
         """
         Save list of dictionaries as csv file
-        :param data: list of tweets as dictionaries
-        :type data: list[dict]
+        :param data: DataFrame to save
+        :type data: pd.DataFrame
         :param data_type: folder where data will be saved from Data Type
         :type data_type: DataType
         :param filename: name of the file
@@ -53,29 +52,39 @@ class PersistenceManager:
     @staticmethod
     def load_from_csv(
             filename: str = 'Car Sales.csv',
-            chunk_size: int = settings.CHUNK_SIZE,
-            dtypes: dict = None,
-            parse_dates: list[str] = None,
-            converters: dict = None
+            data_type: DataType = DataType.RAW,
+            chunk_size: int = settings.CHUNK_SIZE, dtypes: dict = None,
+            parse_dates: list[str] = None, converters: dict = None
     ) -> pd.DataFrame:
         """
         Load dataframe from CSV using chunk scheme
-        :param filename: name of the file
+        :param filename: name of the file including extension
         :type filename: str
+        :param data_type: folder where data will be saved from Data Type
+        :type data_type: DataType
         :param chunk_size: Number of chunks to split dataset
         :type chunk_size: int
         :return: dataframe retrieved from CSV after optimization with chunks
         :rtype: pd.DataFrame
         """
-        # TODO: define column names and its data type to add it to
-        #  read_csv method and also the date columns to parse
+        filepath: str = f'{data_type.value}/{filename}'
+        # combined_converters: dict = {**dtypes, **converters}
+        #
+        # def apply_converter(value):
+        #     try:
+        #         return combined_converters[value]
+        #     except KeyError:
+        #         return value
+
         text_file_reader: TextFileReader = pd.read_csv(
-            filename, header=0, chunksize=chunk_size,
-            encoding=settings.ENCODING, dtype=dtypes, parse_dates=parse_dates,
-            converters=converters
-        )
-        dataframe: pd.DataFrame = pd.concat(
-            text_file_reader, ignore_index=True)
+            filepath, header=0, chunksize=chunk_size,
+            encoding=settings.ENCODING, parse_dates=parse_dates,
+            converters=converters)
+        dataframe: pd.DataFrame = pd.concat(text_file_reader,
+                                            ignore_index=True)
+        for key, value in dtypes.items():
+            print(key, value)
+            dataframe[key] = dataframe[key].astype(value)
         return dataframe
 
     @staticmethod

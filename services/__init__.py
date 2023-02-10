@@ -1,3 +1,3 @@
 """
-Main script
+Services package initialization
 """

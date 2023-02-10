@@ -61,11 +61,32 @@
 
 [![Project][project-screenshot]](https://example.com)
 
-This project is about car-sales-etl...
+This project is about building a data pipeline to extract, transform, and
+load (ETL) data from a source to a target. The data source is a CSV file
+containing information about car sales. The target is a PostgreSQL database
+table.
+A short summary of the approaches and design choices taken in the development
+of the pipeline
+
+### Transformations
+
+- Remove any rows with missing values.
+- Convert the date columns to a standard format.
+- Create a new column to store the year of the sale.
+- Replace the categorical values in the "Car Model" column with numerical
+  values.
+
+### Requirements
+
+- The target database should be either PostgreSQL or MySQL.
+- The pipeline should be runnable using a command-line interface.
+- The pipeline should have error handling and logging capabilities.
+- The pipeline should be modular and easily extendable to handle additional
+  data sources and transformations.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Built with
+## Built with
 
 * [![Python][Python.org]][Python-url]
 

@@ -1,13 +1,20 @@
 """
-Persistence script for Core module
+Persistence script for Core module.
+This script provides methods to save and load dataframes to and from
+ CSV and pickle files, respectively.
 """
+import logging
 from enum import Enum
 
 import pandas as pd
 from pandas import NaT
 from pandas.io.parsers import TextFileReader
 
+from core import logging_config
 from core.config import settings
+
+logging_config.setup_logging()
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class DataType(str, Enum):
@@ -16,21 +23,23 @@ class DataType(str, Enum):
     """
     RAW: str = 'data/raw/'
     PROCESSED: str = 'data/processed/'
+    FIGURES: str = 'reports/figures/'
 
 
 class PersistenceManager:
     """
-    Persistence Manager class
+    Persistence Manager class.
+    Defines the different data types that can be saved and loaded.
     """
 
     @staticmethod
     def save_to_csv(
-            data: pd.DataFrame, data_type: DataType = DataType.PROCESSED,
+            dataframe: pd.DataFrame, data_type: DataType = DataType.PROCESSED,
             filename: str = 'processed_data.csv') -> bool:
         """
         Save dataframe as csv file
-        :param data: DataFrame to save
-        :type data: pd.DataFrame
+        :param dataframe: DataFrame to save
+        :type dataframe: pd.DataFrame
         :param data_type: Path where data will be saved
         :type data_type: DataType
         :param filename: name of the file
@@ -38,15 +47,13 @@ class PersistenceManager:
         :return: True if the csv file was created; otherwise false
         :rtype: bool
         """
-        dataframe: pd.DataFrame
-        if isinstance(data, pd.DataFrame):
-            dataframe = data
-        else:
-            if not data:
-                return False
-            dataframe = pd.DataFrame(data)
+        if len(dataframe) == 0:
+            return False
+        if not settings.ENCODING:
+            raise AttributeError("Encoding is not set.")
         dataframe.to_csv(f'{data_type.value}{filename}', index=False,
                          encoding=settings.ENCODING)
+        logger.info("Dataframe saved to csv")
         return True
 
     @staticmethod
@@ -68,6 +75,8 @@ class PersistenceManager:
         :rtype: pd.DataFrame
         """
         filepath: str = f'{data_type.value}{filename}'
+        if not settings.ENCODING:
+            raise AttributeError("Encoding is not set.")
         text_file_reader: TextFileReader = pd.read_csv(
             filepath, header=0, chunksize=chunk_size,
             encoding=settings.ENCODING, parse_dates=parse_dates,
@@ -81,17 +90,18 @@ class PersistenceManager:
                                                    errors='coerce')
                     dataframe[key] = dataframe[key].astype(value)
                 except Exception as exc:
-                    print(exc)
+                    logger.error(exc)
             else:
                 try:
                     dataframe[key] = dataframe[key].astype(value)
                 except Exception as exc:
-                    print(exc)
+                    logger.error(exc)
+        logger.info("Dataframe loaded from csv")
         return dataframe
 
     @staticmethod
     def save_to_pickle(
-            dataframe: pd.DataFrame, data_type: DataType,
+            dataframe: pd.DataFrame, data_type: DataType = DataType.PROCESSED,
             filename: str = 'optimized_df.pkl') -> None:
         """
         Save dataframe to pickle file
@@ -104,7 +114,8 @@ class PersistenceManager:
         :return: None
         :rtype: NoneType
         """
-        dataframe.to_pickle(f'data/{data_type.value}/{filename}')
+        dataframe.to_pickle(f'{data_type.value}{filename}')
+        logger.info("Dataframe saved to pickle")
 
     @staticmethod
     def load_from_pickle(
@@ -121,4 +132,5 @@ class PersistenceManager:
         """
         dataframe: pd.DataFrame = pd.read_pickle(
             f'data/{data_type.value}/{filename}')
+        logger.info("Dataframe loaded from pickle")
         return dataframe

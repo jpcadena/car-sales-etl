@@ -2,7 +2,6 @@
 Config script for Core module
 """
 import datetime
-from functools import lru_cache
 from typing import Optional, Any
 
 # pylint: disable=no-name-in-module
@@ -41,7 +40,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    SQLALCHEMY_DATABASE_URI: PostgresDsn = None
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str],
@@ -84,13 +83,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-
-@lru_cache()
-def get_setting() -> Settings:
-    """
-    Get settings cached
-    :return: settings object
-    :rtype: Settings
-    """
-    return Settings()

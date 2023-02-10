@@ -1,6 +1,7 @@
 """
 Transformation script for Engineering module
 """
+import logging
 import re
 from typing import Any
 
@@ -8,7 +9,11 @@ import numpy as np
 import pandas as pd
 from numpy import uint16, uint8, float16
 
+from core import logging_config
 from core.config import settings
+
+logging_config.setup_logging()
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 def cast_column(
@@ -42,13 +47,12 @@ def remove_missing_values(
     """
     missing_values: pd.Series = (dataframe.isnull().sum())
     if len(missing_values) > 0:
+        logger.warning("FOUND MISSING VALUES")
         print(missing_values[missing_values > 0])
         print(missing_values[missing_values > 0] / dataframe.shape[0] * 100)
-        dataframe = dataframe[~dataframe['Purchase Date'].isnull()]
-        dataframe.reset_index(drop=True, inplace=True)
         dataframe = dataframe.copy()
-        dataframe.dropna(how=how_to_drop, inplace=True)
-    dataframe.reset_index(drop=True, inplace=True)
+        dataframe = dataframe[~dataframe['Purchase Date'].isnull()].dropna(
+            how=how_to_drop).reset_index(drop=True)
     return dataframe
 
 
@@ -107,12 +111,17 @@ def create_categorical_model(
     make_counts = dataframe[model_column].value_counts()
     dataframe['Make_Frequency'] = dataframe[model_column].map(
         make_counts).astype(uint16)
+    if not settings.NUM_BINS:
+        raise AttributeError("Number of bins is not set.")
+    if not settings.LABELS:
+        raise AttributeError("Labels is not set.")
     quantiles: list[float16] = np.linspace(
         0.00, 1.00, uint8(settings.NUM_BINS) + 1, dtype=float16)
     dataframe['Make Classification'] = pd.qcut(
         dataframe['Make_Frequency'], q=quantiles,
         labels=settings.LABELS).astype("category")
-    dataframe.drop([model_column, 'Make_Frequency'], axis=1, inplace=True)
+    dataframe = dataframe.drop(
+        [model_column, 'Make_Frequency'], axis=1)
     # Other option could be use Pandas Dummies or LabelTransformer
     # from Scikit-Learn
     car_model_map: dict[str, uint8] = {
@@ -144,6 +153,20 @@ def convert_column_names(dataframe: pd.DataFrame):
     :return: New Dataframe with converted column names
     :rtype: pd.DataFrame
     """
-    dataframe.columns = [col.strip() for col in dataframe.columns]
     dataframe.columns = [pascal_to_snake(col) for col in dataframe.columns]
+    return dataframe
+
+
+def strip_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
+    """
+    Function to strip column names and cells in string columns
+    :param dataframe: Dataframe to apply the function
+    :type dataframe: pd.DataFrame
+    :return: New Dataframe without blank spaces
+    :rtype: pd.DataFrame
+    """
+    dataframe.columns = [col.strip() for col in dataframe.columns]
+    for column in dataframe.columns:
+        if dataframe[column].dtype == object:
+            dataframe[column] = dataframe[column].str.strip()
     return dataframe

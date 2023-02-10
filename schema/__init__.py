@@ -1,3 +1,3 @@
 """
-Main script
+Schema package initialization
 """

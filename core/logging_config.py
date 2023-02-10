@@ -9,7 +9,7 @@ from logging.handlers import SMTPHandler
 from core.config import settings
 
 
-def setup_logging(log_level: int = logging.INFO) -> None:
+def setup_logging(log_level: int = logging.DEBUG) -> None:
     """
     Setup logging
     :param log_level: Level of logging
@@ -33,12 +33,25 @@ def setup_logging(log_level: int = logging.INFO) -> None:
     logger.addHandler(console_handler)
 
     formatter = logging.Formatter(
-        '[%(asctime)s][%(levelname)s][%(module)s][%(funcName)s][%(lineno)d]:'
-        ' %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        '[%(name)s][%(asctime)s][%(levelname)s][%(module)s][%(funcName)s][%('
+        'lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     file_handler: logging.FileHandler = logging.FileHandler(filename_path)
     file_handler.setLevel(log_level)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+
+    if not settings.MAIL_SERVER:
+        raise AttributeError("Mail server is not set.")
+    if not settings.MAIL_FROM:
+        raise AttributeError("Mail from address is not set.")
+    if not settings.MAIL_TO:
+        raise AttributeError("Mail to address is not set.")
+    if not settings.MAIL_SUBJECT:
+        raise AttributeError("Mail subject is not set.")
+    if not settings.MAIL_CREDENTIALS:
+        raise AttributeError("Mail credentials is not set.")
+    if not settings.MAIL_TIMEOUT:
+        raise AttributeError("Mail timeout is not set.")
 
     if log_level == logging.CRITICAL:
         mail_handler = SMTPHandler(

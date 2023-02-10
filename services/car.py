@@ -1,13 +1,18 @@
 """
-Main script
+Car service script
 """
+import logging
 from typing import Optional
 
 from sqlalchemy.exc import ArgumentError, PendingRollbackError, \
     MultipleResultsFound, IdentifierError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core import logging_config
 from models.car import Car
+
+logging_config.setup_logging()
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class CarService:
@@ -16,7 +21,7 @@ class CarService:
     """
 
     @staticmethod
-    async def read_car_sale(
+    async def read_sale_by_id(
             sale_id: int, session: AsyncSession) -> Optional[Car]:
         """
         Read car sale information from table
@@ -31,11 +36,12 @@ class CarService:
         try:
             car = await session.get(Car, sale_id)
         except MultipleResultsFound as mrf_exc:
-            print(mrf_exc)
+            logger.error(mrf_exc)
         except ArgumentError as a_exc:
-            print(a_exc)
+            logger.error(a_exc)
         except IdentifierError as i_exc:
-            print(i_exc)
+            logger.error(i_exc)
+        logger.info("FOUND Car sale!")
         return car
 
     @staticmethod
@@ -53,18 +59,19 @@ class CarService:
             try:
                 session.add(car)
             except ArgumentError as a_exc:
-                print(a_exc)
+                logger.error(a_exc)
                 await session.rollback()
                 return False
             except PendingRollbackError as pr_exc:
-                print(pr_exc)
+                logger.error(pr_exc)
                 await session.rollback()
                 return False
             await session.commit()
+            logger.info("Row inserted successfully")
             return True
 
     @staticmethod
-    async def insert_cars_sales(
+    async def insert_multiple_car_sales(
             cars: list[Car], session: AsyncSession) -> bool:
         """
         Insert multiple cars sales into the table
@@ -79,12 +86,13 @@ class CarService:
             try:
                 session.add_all(cars)
             except ArgumentError as a_exc:
-                print(a_exc)
+                logger.error(a_exc)
                 await session.rollback()
                 return False
             except PendingRollbackError as pr_exc:
-                print(pr_exc)
+                logger.error(pr_exc)
                 await session.rollback()
                 return False
             await session.commit()
+            logger.info("Rows inserted successfully")
             return True

@@ -9,8 +9,9 @@ import pandas as pd
 
 from analysis import numerical_eda, visualize_data
 from core import logging_config
+from core.persistence_manager import PersistenceManager
 from db.db import init_db
-from engineering import extract_data, transform_data, load_data
+from engineering import extract_data, transform_data, load_to_db
 
 logging_config.setup_logging()
 logger: logging.Logger = logging.getLogger(__name__)
@@ -27,18 +28,21 @@ async def main() -> None:
     numerical_eda(dataframe)
     transformed_df = transform_data(dataframe)
     visualize_data(transformed_df)
-    numerical_eda(transformed_df)
-    # TODO: generate processed dataset
+    PersistenceManager.save_to_pickle(transformed_df)
     await init_db()
-    # TODO: Check Pandas.to_sql() performance against Async SQLAlchemy
-    loaded: bool = await load_data(transformed_df)
-    print(loaded)
-    await asyncio.sleep(1)
+    numerical_eda(transformed_df)  # Check statistics for final df
+    try:
+        loaded: bool = await load_to_db(transformed_df)
+    except Exception as exc:
+        logger.error(exc)
+        raise exc
+    if loaded:
+        logger.info("Data loaded")
     logger.info("ETL pipeline completed successfully")
 
 
 if __name__ == '__main__':
-    logger.info("first log message")
+    logger.info("First log message")
     with concurrent.futures.ThreadPoolExecutor() as executor:
         logger.warning("Executing Thread Pool")
         executor.submit(asyncio.run, main())

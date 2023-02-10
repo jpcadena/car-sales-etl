@@ -8,7 +8,7 @@ from core.persistence_manager import PersistenceManager
 from schema.gender import Gender
 
 
-def extraction(
+def extract_raw_data(
         filename: str, gender_column: str, parse_dates: list[str] | None = None
 ) -> pd.DataFrame:
     """

@@ -20,7 +20,7 @@
 <h3 align="center">car-sales-etl</h3>
 
   <p align="center">
-    Description for car-sales-etl
+    Description for car-sales-etl project
     <br />
     <a href="https://github.com/jpcadena/car-sales-etl"><strong>Explore the docs »</strong></a>
     <br />
@@ -65,8 +65,6 @@ This project is about building a data pipeline to extract, transform, and
 load (ETL) data from a source to a target. The data source is a CSV file
 containing information about car sales. The target is a PostgreSQL database
 table.
-A short summary of the approaches and design choices taken in the development
-of the pipeline
 
 ### Transformations
 
@@ -100,7 +98,7 @@ of the pipeline
 
 ### Prerequisites
 
-* [Python 3.10+][Python-url]
+* [Python 3.10+][Python-docs-url]
 
 ### Installation
 
@@ -137,9 +135,9 @@ of the pipeline
 
 ### Usage
 
-1. If found **sample.env**, rename it with to **.env**.
+1. Rename file **sample.env** to **.env**.
 2. Replace your **credentials** into the *.env* file.
-3. Execute with console
+3. Execute with console.
     ```
     python main.py
     ```
@@ -170,6 +168,7 @@ following [PEP 8](https://peps.python.org/pep-0008/).\
 Check documentation
 for [Visual Studio Code](https://code.visualstudio.com/docs/python/linting#_run-linting)
 or [Jetbrains Pycharm](https://github.com/leinardi/pylint-pycharm/blob/master/README.md).\
+
 Recommended plugin for
 autocompletion: [Tabnine](https://www.tabnine.com/install)
 
@@ -209,3 +208,5 @@ E-mail: [Juan Pablo Cadena Aguilar](mailto:jpcadena@espol.edu.ec?subject=[GitHub
 [Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 
 [Python-url]: https://www.python.org/
+
+[Python-docs-url]: https://docs.python.org/3/

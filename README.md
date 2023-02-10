@@ -209,4 +209,4 @@ E-mail: [Juan Pablo Cadena Aguilar](mailto:jpcadena@espol.edu.ec?subject=[GitHub
 
 [Python-url]: https://www.python.org/
 
-[Python-docs-url]: https://docs.python.org/3/
+[Python-docs-url]: https://docs.python.org/3.10/

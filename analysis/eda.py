@@ -10,53 +10,8 @@ from matplotlib import pyplot as plt
 
 from core.config import settings
 
+pd.set_option('display.max_columns', 10)
 
-# MISSING_VALUES_PCT = 0.01
-# raw_df: pd.DataFrame = PersistenceManager.load_from_csv()
-# d1: datetime = datetime.strptime("01/01/2018", "%d/%m/%Y")
-# d2: datetime = datetime.strptime("31/12/2022", "%d/%m/%Y")
-# np.random.seed(42)
-#
-#
-# def random_date(first_date: datetime, second_date: datetime):
-#     first_timestamp = int(first_date.timestamp())
-#     second_timestamp = int(second_date.timestamp())
-#     random_timestamp = randint(first_timestamp, second_timestamp)
-#     return datetime.fromtimestamp(random_timestamp)
-#
-#
-# raw_df['Purchase Date'] = [random_date(d1, d2) for _ in range(
-#     raw_df.shape[0])]
-#
-# np.random.seed(0)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Buyer Age']] = np.nan
-#
-# np.random.seed(1)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Discount']] = np.nan
-# np.random.seed(2)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Sale Price']] = np.nan
-#
-# np.random.seed(3)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Buyer Gender']] = None
-# np.random.seed(4)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Color']] = None
-# np.random.seed(5)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Make']] = None
-# np.random.seed(6)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['New Car']] = None
-# np.random.seed(7)
-# mask = np.random.rand(len(raw_df)) < MISSING_VALUES_PCT
-# raw_df.loc[mask, ['Purchase Date']] = NaT
-#
-# saved: bool = PersistenceManager.save_to_csv(raw_df, DataType.RAW,
-#                                              'raw_data.csv')
 
 def analyze_dataframe(dataframe: pd.DataFrame) -> None:
     """
@@ -73,11 +28,11 @@ def analyze_dataframe(dataframe: pd.DataFrame) -> None:
     print(dataframe.memory_usage(deep=True))
     print(dataframe.describe(include='all', datetime_is_numeric=True))
 
-    non_numeric_df = dataframe.select_dtypes(exclude=settings.NUMERICS)
-    for column in non_numeric_df.columns:
-        print(non_numeric_df[column].value_counts())
-        print(non_numeric_df[column].unique())
-        print(non_numeric_df[column].value_counts(normalize=True) * 100)
+    # non_numeric_df = dataframe.select_dtypes(exclude=settings.NUMERICS)
+    # for column in non_numeric_df.columns:
+    #     print(non_numeric_df[column].value_counts())
+    #     print(non_numeric_df[column].unique())
+    #     print(non_numeric_df[column].value_counts(normalize=True) * 100)
 
 
 def plot_count(dataframe: pd.DataFrame, hue: str) -> None:
@@ -90,8 +45,7 @@ def plot_count(dataframe: pd.DataFrame, hue: str) -> None:
     """
     plot_iterator: int = 1
     variables = dataframe.select_dtypes(
-        include=['Int64', 'bool', 'category', 'object'])
-    print(variables)
+        include=['bool', 'category', 'object'])
     label: str
     for i in variables:
         plt.figure(figsize=settings.FIG_SIZE)
@@ -166,28 +120,30 @@ def boxplot_dist(
     plt.show()
 
 
-def plot_scatter(dataframe: pd.DataFrame, x: str, y: str, hue: str) -> None:
+def plot_scatter(
+        dataframe: pd.DataFrame, x_column: str, y_column: str, hue: str
+) -> None:
     """
     This method plots the relationship between x and y for hue subset
     :param dataframe: dataframe containing tweets
     :type dataframe: pd.DataFrame
-    :param x: x-axis column name from dataframe
-    :type x: str
-    :param y: y-axis column name from dataframe
-    :type y: str
+    :param x_column: x-axis column name from dataframe
+    :type x_column: str
+    :param y_column: y-axis column name from dataframe
+    :type y_column: str
     :param hue: grouping variable to filter plot
     :type hue: str
     :return: None
     :rtype: NoneType
     """
     plt.figure(figsize=settings.FIG_SIZE)
-    sns.scatterplot(x=x, data=dataframe, y=y, hue=hue,
+    sns.scatterplot(x=x_column, data=dataframe, y=y_column, hue=hue,
                     palette=settings.PALETTE)
     label: str = re.sub(
-        pattern=settings.RE_PATTERN, repl=settings.RE_REPL, string=y)
-    plt.title(f'{x} Wise {label} Distribution')
-    print(dataframe[[x, y]].corr())
-    plt.savefig(f'reports/figures/{x}_{y}_{hue}.png')
+        pattern=settings.RE_PATTERN, repl=settings.RE_REPL, string=y_column)
+    plt.title(f'{x_column} Wise {label} Distribution')
+    print(dataframe[[x_column, y_column]].corr())
+    plt.savefig(f'reports/figures/{x_column}_{y_column}_{hue}.png')
     plt.show()
 
 
@@ -200,7 +156,8 @@ def plot_heatmap(dataframe: pd.DataFrame) -> None:
     :rtype: NoneType
     """
     plt.figure(figsize=settings.FIG_SIZE)
-    sns.heatmap(data=dataframe.corr(), annot=True, cmap="RdYlGn")
+    sns.heatmap(data=dataframe.select_dtypes(
+        include=settings.NUMERICS).corr(), annot=True, cmap="RdYlGn")
     plt.title('Heatmap showing correlations among columns',
               fontsize=settings.FONT_SIZE)
     plt.savefig('reports/figures/correlations_heatmap.png')

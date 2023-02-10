@@ -1,46 +1,31 @@
 """
 Config script for Core module
 """
+import datetime
 from functools import lru_cache
 from typing import Optional, Any
 
 # pylint: disable=no-name-in-module
-from pydantic import BaseSettings, PostgresDsn, validator, EmailStr, \
-    root_validator
-
-
-@root_validator(pre=True)
-def validate_mail_credentials(values):
-    """
-    Validate email credentials before reading the env file
-    :param values:
-    :type values:
-    :return:
-    :rtype:
-    """
-    mail_credentials = values.get('MAIL_CREDENTIALS')
-    if mail_credentials:
-        username, password = mail_credentials.split(':')
-        values['MAIL_CREDENTIALS'] = (username, password)
-    return values
+from pydantic import BaseSettings, PostgresDsn, validator, EmailStr
 
 
 class Settings(BaseSettings):
     """
     Settings class that inherited from Pydantic BaseSettings
     """
-    MAX_COLUMNS: int
-    WIDTH: int
-    CHUNK_SIZE: int
     ENCODING: str
     NUM_BINS: int
-
+    MAX_COLUMNS: int
+    CHUNK_SIZE: int
+    WIDTH: int
     PALETTE: str
     FONT_SIZE: int
-    FIG_SIZE: tuple[int, int] = (15, 8)
+    RE_PATTERN: str
+    RE_REPL: str
     COLORS: list[str]
     LABELS: list[str]
 
+    FIG_SIZE: tuple[int, int] = (15, 8)
     NUMERICS: list[str] = [
         'uint8', 'uint16', 'uint32', 'uint64',
         'int8', 'int16', 'int32',
@@ -86,6 +71,8 @@ class Settings(BaseSettings):
     MAIL_SUBJECT: str
     MAIL_CREDENTIALS: list[str]
     MAIL_TIMEOUT: float
+
+    CURRENT_YEAR: int = datetime.date.today().year
 
     class Config:
         """

@@ -5,6 +5,7 @@ from sqlalchemy.exc import CompileError, DataError, DatabaseError, \
     DisconnectionError, IntegrityError, InternalError, InvalidatePoolError, \
     PendingRollbackError, TimeoutError as SATimeoutError
 from sqlalchemy.ext.asyncio import AsyncTransaction
+
 from db.base import Base
 from db.session import async_engine
 
@@ -19,7 +20,8 @@ async def create_db_and_tables() -> None:
         try:
             transaction: AsyncTransaction = async_connection.begin()
             await transaction.start()
-            await async_connection.run_sync(Base.metadata.drop_all)
+            await async_connection.run_sync(Base.metadata.drop_alll,
+                                            checkfirst=True, cascade=True)
             await async_connection.run_sync(
                 Base.metadata.create_all, checkfirst=True)
             await transaction.commit()

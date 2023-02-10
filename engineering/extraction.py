@@ -8,9 +8,9 @@ from core.persistence_manager import PersistenceManager
 from schema.gender import Gender
 
 
-def extract_data(
-        filename: str = 'raw_data.csv', gender_column: str = "Buyer Gender",
-        parse_dates: list[str] | None = None) -> pd.DataFrame:
+def extraction(
+        filename: str, gender_column: str, parse_dates: list[str] | None = None
+) -> pd.DataFrame:
     """
     Engineering method to extract raw data from csv file
     :param filename: Filename to extract data from
@@ -24,8 +24,7 @@ def extract_data(
     """
     d_types: dict = {
         'Buyer Gender': str, 'Color': str, 'Make': str, 'New Car': bool,
-        'Purchase Date': str, 'Buyer Age': 'Int64', 'Discount': float16,
-        'Sale Price': float32}
+        'Buyer Age': int, 'Discount': float16, 'Sale Price': float32}
     mapping: dict[str, str] = {
         'Male': Gender.MALE.value, 'Agender': Gender.OTHER.value,
         'Female': Gender.FEMALE.value, 'Non-binary': Gender.OTHER.value,

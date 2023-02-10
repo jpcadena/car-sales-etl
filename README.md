@@ -71,18 +71,18 @@ transaction management and its highly scalability to provide great performance
 at CRUD operations.\
 The project followed SQLAlchemy models scheme based on OOP concepts that
 provide an excellent abstraction when working with multiple datasets for a
-future process. This high level abstraction provides a greater control over
-the data being inserted as the table structure can be defined with multiple
+future process. This high level abstraction provides a greater control over the
+data being inserted as the table structure can be defined with multiple
 constraints and relationships.\
 For more advanced requirements, transactions, migrations and more complex
 operations can be performed through the ORM so managing large amounts of data
 won't be an issue.\
 The project also works with PEP8 style that is tested with Pylint and this
-includes type hinting for variables, functions arguments and more.\
+includes type hinting for variables, functions arguments and more.
 
 If performance is critical, consider using Python 3.11 in terms of handling
-exceptions that can be thrown and re-raised in shorter execution times.
-Assets are also included with future consideration for HTML and CSS files.
+exceptions that can be thrown and re-raised in shorter execution times.\
+Assets are also included with future consideration for HTML and CSS files.\
 Testing could be done using unittests (to be implemented in a future release).
 
 ### Transformations

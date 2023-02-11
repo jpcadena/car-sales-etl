@@ -78,7 +78,7 @@ class PersistenceManager:
         if not settings.ENCODING:
             raise AttributeError("Encoding is not set.")
         text_file_reader: TextFileReader = pd.read_csv(
-            filepath, header=0, chunksize=chunk_size,
+            filepath, sep=', ', header=0, chunksize=chunk_size,
             encoding=settings.ENCODING, parse_dates=parse_dates,
             converters=converters, na_values=[NaT, 'nan', '', ' '])
         dataframe: pd.DataFrame = pd.concat(text_file_reader,

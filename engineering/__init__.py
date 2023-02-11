@@ -4,7 +4,7 @@ Engineering package initialization
 import logging
 
 import pandas as pd
-from numpy import uint16, uint8
+from numpy import uint16, uint8, float16
 from sqlalchemy import create_engine, Engine
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,6 +52,7 @@ def transform_data(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe = create_sale_year(dataframe)
     dataframe = create_categorical_model(dataframe)
     dataframe = convert_column_names(dataframe)
+    dataframe = cast_column(dataframe, 'discount', float16)
     dataframe = cast_column(dataframe, 'purchase_year', uint16)
     dataframe = cast_column(dataframe, 'buyer_age', uint8)
     return dataframe

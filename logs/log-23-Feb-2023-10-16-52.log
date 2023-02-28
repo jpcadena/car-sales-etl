@@ -1,0 +1,3 @@
+[core.decorators][2023-02-23 10:16:52][INFO][decorators][wrapper][17]: Calling count_prime_numbers
+[core.decorators][2023-02-23 10:16:52][INFO][decorators][wrapper][32]: Execution of count_prime_numbers took 0.03416549999383278 seconds.
+[core.decorators][2023-02-23 10:16:52][INFO][decorators][wrapper][19]: Finished count_prime_numbers
